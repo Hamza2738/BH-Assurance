@@ -1,0 +1,54 @@
+<div class="container mt-4">
+  <h3>Gestion des rôles</h3>
+
+  <!-- Création d’un nouveau rôle -->
+  <div class="d-flex mb-3">
+    <input type="text" [(ngModel)]="newRoleNom" class="form-control me-2" placeholder="Nouveau rôle" />
+    <button class="btn btn-primary" (click)="createRole()">Ajouter</button>
+  </div>
+
+  <!-- Tableau des rôles -->
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nom</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let role of roles">
+        <td>{{ role.id }}</td>
+        <td *ngIf="editId !== role.id">{{ role.nom }}</td>
+        <td *ngIf="editId === role.id">
+          <input [(ngModel)]="editNom" class="form-control" />
+        </td>
+        <td>
+          <button *ngIf="editId !== role.id" class="btn btn-sm btn-warning me-1" (click)="startEdit(role)">Modifier</button>
+          <button *ngIf="editId === role.id" class="btn btn-sm btn-success me-1" (click)="updateRole()">Enregistrer</button>
+          <button *ngIf="editId === role.id" class="btn btn-sm btn-secondary me-1" (click)="cancelEdit()">Annuler</button>
+          <button class="btn btn-sm btn-danger me-1" (click)="deleteRole(role.id)">Supprimer</button>
+          <button class="btn btn-sm btn-info" (click)="onViewUsers(role.id)">Voir utilisateurs</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Liste des utilisateurs du rôle sélectionné -->
+<div *ngIf="selectedUsers.length > 0" class="mt-4">
+  <h5>Utilisateurs du rôle "{{ selectedRoleNom }}"</h5>
+  <ul class="list-group">
+    <li *ngFor="let user of selectedUsers" class="list-group-item">
+      <strong>{{ user.nom }} {{ user.prenom }}</strong><br />
+      Email : {{ user.email }}<br />
+      Poste : {{ user.poste || 'Non défini' }}
+    </li>
+  </ul>
+</div>
+
+<!-- Message si aucun utilisateur -->
+<div *ngIf="selectedUsers.length === 0 && selectedRoleNom" class="text-muted mt-4">
+  Aucun utilisateur trouvé pour le rôle "{{ selectedRoleNom }}".
+</div>
+
+</div>

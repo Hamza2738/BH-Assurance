@@ -1,0 +1,169 @@
+<div class="container mt-4">
+  <h3>Gestion des utilisateurs</h3>
+
+  <!-- Filtrage par rôle -->
+  <div class="mb-3 w-25">
+    <label for="roleFilter" class="form-label">Filtrer par rôle :</label>
+    <select
+      id="roleFilter"
+      class="form-select"
+      [(ngModel)]="selectedRoleId"
+      (change)="fetchEmployes()"
+    >
+      <option [ngValue]="'all'">Tous</option>
+      <option *ngFor="let r of roles" [ngValue]="r.id">{{ r.nom }}</option>
+    </select>
+  </div>
+
+  <!-- Tableau des utilisateurs -->
+  <table class="table table-bordered table-hover">
+    <thead class="table-light">
+      <tr>
+        <th>ID</th>
+        <th>Nom & Prénom</th>
+        <th>Email</th>
+        <th>Département</th>
+        <th>Grade</th>
+        <th>Poste</th>
+        <th>Rôle</th>
+        <th>Actif</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let e of employes">
+        <td>{{ e.id }}</td>
+        <td>{{ e.nom }} {{ e.prenom }}</td>
+        <td>{{ e.email }}</td>
+        <td>{{ getDepartementNom(e.departement_id) }}</td>
+        <td>{{ getGradeTitre(e.grade_id) }}</td>
+        <td>{{ e.poste }}</td>
+        <td>{{ getRoleNom(e.role_id) }}</td>
+        <td>
+          <span class="badge" [ngClass]="e.is_active ? 'bg-success' : 'bg-danger'">
+            {{ e.is_active ? 'Oui' : 'Non' }}
+          </span>
+        </td>
+        <td>
+          <button class="btn btn-sm btn-warning me-1" (click)="onEdit(e)">Modifier</button>
+          <button class="btn btn-sm btn-danger me-1" (click)="onDelete(e)">Supprimer</button>
+          <button class="btn btn-sm btn-secondary" (click)="toggleActivation(e)">
+            {{ e.is_active ? 'Désactiver' : 'Activer' }}
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Formulaire de modification -->
+  <div *ngIf="editEmploye" class="card mt-4">
+    <div class="card-header">Modifier l'utilisateur</div>
+    <div class="card-body">
+      <form (ngSubmit)="updateEmploye()" #formModif="ngForm" class="row g-3">
+        <div class="col-md-6">
+          <label for="nom" class="form-label">Nom</label>
+          <input
+            id="nom"
+            class="form-control"
+            [(ngModel)]="editEmploye.nom"
+            name="nom"
+            required
+          />
+        </div>
+
+        <div class="col-md-6">
+          <label for="prenom" class="form-label">Prénom</label>
+          <input
+            id="prenom"
+            class="form-control"
+            [(ngModel)]="editEmploye.prenom"
+            name="prenom"
+            required
+          />
+        </div>
+
+        <div class="col-md-6">
+          <label for="email" class="form-label">Email</label>
+          <input
+            id="email"
+            type="email"
+            class="form-control"
+            [(ngModel)]="editEmploye.email"
+            name="email"
+            required
+          />
+        </div>
+
+        <div class="col-md-6">
+          <label for="poste" class="form-label">Poste</label>
+          <input
+            id="poste"
+            class="form-control"
+            [(ngModel)]="editEmploye.poste"
+            name="poste"
+          />
+        </div>
+
+        <div class="col-md-6">
+          <label for="departement" class="form-label">Département</label>
+          <select
+            id="departement"
+            class="form-select"
+            [(ngModel)]="editEmploye.departement_id"
+            name="departement_id"
+            required
+          >
+            <option [ngValue]="0" disabled>Sélectionner un département</option>
+            <option *ngFor="let d of departements" [ngValue]="d.id">{{ d.nom }}</option>
+          </select>
+        </div>
+
+        <div class="col-md-6">
+          <label for="grade" class="form-label">Grade</label>
+          <select
+            id="grade"
+            class="form-select"
+            [(ngModel)]="editEmploye.grade_id"
+            name="grade_id"
+            required
+          >
+            <option [ngValue]="0" disabled>Sélectionner un grade</option>
+            <option *ngFor="let g of grades" [ngValue]="g.id">{{ g.titre }}</option>
+          </select>
+        </div>
+
+        <div class="col-md-6">
+          <label for="role" class="form-label">Rôle</label>
+          <select
+            id="role"
+            class="form-select"
+            [(ngModel)]="editEmploye.role_id"
+            name="role_id"
+            required
+          >
+            <option [ngValue]="0" disabled>Sélectionner un rôle</option>
+            <option *ngFor="let r of roles" [ngValue]="r.id">{{ r.nom }}</option>
+          </select>
+        </div>
+
+        <div class="col-md-6 d-flex align-items-center">
+          <div class="form-check mt-4">
+            <input
+              id="is_active"
+              type="checkbox"
+              class="form-check-input"
+              [(ngModel)]="editEmploye.is_active"
+              name="is_active"
+            />
+            <label for="is_active" class="form-check-label">Actif</label>
+          </div>
+        </div>
+
+        <div class="col-12 d-flex gap-2 mt-3">
+          <button type="submit" class="btn btn-primary">Mettre à jour</button>
+          <button type="button" class="btn btn-secondary" (click)="cancelEdit()">Annuler</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

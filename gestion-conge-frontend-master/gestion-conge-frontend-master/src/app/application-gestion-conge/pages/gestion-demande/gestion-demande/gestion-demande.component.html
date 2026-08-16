@@ -1,0 +1,135 @@
+<div class="container mt-3">
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>Gestion des demandes</h3>
+    <div class="d-flex align-items-center gap-2">
+      <button class="btn btn-danger" (click)="nettoyerExpirees()">Nettoyer demandes expirées</button>
+
+      <select class="form-select w-auto ms-2" [(ngModel)]="selectedStatut" (change)="fetchDemandes()">
+        <option value="all">Tous</option>
+        <option value="en attente">En attente</option>
+        <option value="accepté">Accepté</option>
+        <option value="rejeté">Rejeté</option>
+      </select>
+    </div>
+  </div>
+
+  <table class="table table-bordered table-hover">
+    <thead class="table-light">
+      <tr>
+        <th>Utilisateur</th>
+        <th>Type congé</th>
+        <th>Date début</th>
+        <th>Date fin</th>
+        <th>Nb jours</th>
+        <th>Solde restant</th>
+        <th>État</th>
+        <th>Motif</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let d of demandes">
+        <td>{{ d.utilisateur?.nom }} {{ d.utilisateur?.prenom }}</td>
+        <td>{{ d.type_conge_nom }}</td>
+        <td>{{ d.date_debut }}</td>
+        <td>{{ d.date_fin }}</td>
+        <td>{{ d.nb_jours }}</td>
+        <td>{{ d.solde_rest ?? '-' }}</td>
+        <td>
+          <span
+            [ngClass]="{
+              'badge bg-warning': (d.etat || '').toLowerCase().includes('attente'),
+              'badge bg-success': (d.etat || '').toLowerCase().includes('accepté'),
+              'badge bg-danger':  (d.etat || '').toLowerCase().includes('rejeté'),
+              'badge bg-primary': (d.etat || '').toLowerCase().includes('final') || (d.etat || '').toLowerCase().includes('phase 1')
+            }">
+            {{ d.etat }}
+          </span>
+        </td>
+        <td>{{ d.motif }}</td>
+        <td class="text-nowrap">
+          <!-- Manager traite uniquement si phase1 en attente -->
+          <button
+            *ngIf="!isSuperAdmin() && (d.statut_phase1?.toLowerCase() === 'en attente')"
+            class="btn btn-secondary btn-sm"
+            (click)="openChangeStatut(d)">
+            Traiter
+          </button>
+
+          <!-- Super Admin traite uniquement si phase1 accepté & final en attente -->
+          <button
+            *ngIf="isSuperAdmin() && (d.statut_phase1?.toLowerCase() === 'accepté') && (d.statut_final?.toLowerCase() === 'en attente' || !d.statut_final)"
+            class="btn btn-secondary btn-sm"
+            (click)="openChangeStatut(d)">
+            Traiter
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Modal édition demande -->
+  <div *ngIf="editDemande" class="modal d-block" tabindex="-1" role="dialog" aria-modal="true">
+    <div class="modal-dialog">
+      <div class="modal-content p-3">
+        <h5>Éditer la demande</h5>
+        <div class="mb-2">
+          <label>Date début</label>
+          <input type="date" class="form-control" [(ngModel)]="editDemande.date_debut">
+        </div>
+        <div class="mb-2">
+          <label>Date fin</label>
+          <input type="date" class="form-control" [(ngModel)]="editDemande.date_fin">
+        </div>
+        <div class="mb-2">
+          <label>Motif</label>
+          <input type="text" class="form-control" [(ngModel)]="editDemande.motif">
+        </div>
+        <div class="text-end">
+          <button class="btn btn-secondary me-2" (click)="cancelEdit()">Annuler</button>
+          <button class="btn btn-primary" (click)="updateDemande()">Sauvegarder</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal changement statut -->
+  <div *ngIf="changeStatutDemande" class="modal d-block" tabindex="-1" role="dialog" aria-modal="true">
+    <div class="modal-dialog">
+      <div class="modal-content p-3">
+        <h5>Changer le statut</h5>
+        <p class="mb-3">
+          Demande du {{ changeStatutDemande.date_debut }} au {{ changeStatutDemande.date_fin }}
+          — Statut actuel :
+          <strong
+            [ngClass]="{
+              'badge bg-warning': (changeStatutDemande.etat || '').toLowerCase().includes('attente'),
+              'badge bg-success': (changeStatutDemande.etat || '').toLowerCase().includes('accepté'),
+              'badge bg-danger':  (changeStatutDemande.etat || '').toLowerCase().includes('rejeté'),
+              'badge bg-primary': (changeStatutDemande.etat || '').toLowerCase().includes('final') || (changeStatutDemande.etat || '').toLowerCase().includes('phase 1')
+            }">
+            {{ changeStatutDemande.etat }}
+          </strong>
+        </p>
+
+        <!-- Actions Super Admin -->
+        <div *ngIf="isSuperAdmin()">
+          <button class="btn btn-success me-2" (click)="saveNewStatutSuperAdmin('accepté')">Accepter</button>
+          <button class="btn btn-danger  me-2" (click)="saveNewStatutSuperAdmin('rejeté')">Rejeter</button>
+          <button class="btn btn-secondary" (click)="cancelChangeStatut()">Annuler</button>
+        </div>
+
+        <!-- Actions Manager -->
+        <div *ngIf="!isSuperAdmin()">
+          <button class="btn btn-success me-2" (click)="saveNewStatutManager('accepté')">Accepter</button>
+          <button class="btn btn-danger  me-2" (click)="saveNewStatutManager('rejeté')">Rejeter</button>
+          <button class="btn btn-secondary" (click)="cancelChangeStatut()">Annuler</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>

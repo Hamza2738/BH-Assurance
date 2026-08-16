@@ -1,0 +1,131 @@
+<div class="container mt-4">
+  <h3>Ajouter un utilisateur</h3>
+
+  <form (ngSubmit)="onSubmit()" #formAjoutUtilisateur="ngForm" novalidate>
+    <div class="row g-3">
+      <!-- Champs texte: nom, prénom, email requis -->
+      <div
+        class="col-md-6"
+        *ngFor="let field of [
+          { label: 'Nom', name: 'nom', required: true,  type: 'text',  autocomplete: 'family-name' },
+          { label: 'Prénom', name: 'prenom', required: true,  type: 'text',  autocomplete: 'given-name' },
+          { label: 'Email', name: 'email', required: true,  type: 'email', autocomplete: 'email' },
+          { label: 'CIN', name: 'cin', required: false, type: 'text',  autocomplete: 'off' },
+          { label: 'Téléphone', name: 'num_tel', required: false, type: 'tel',  autocomplete: 'tel' },
+          { label: 'Date de naissance', name: 'date_naissance', required: false, type: 'date' },
+          { label: 'Poste', name: 'poste', required: false, type: 'text',  autocomplete: 'organization-title' }
+        ]"
+      >
+        <label class="form-label" [for]="field.name">
+          {{ field.label }} <span *ngIf="field.required" class="text-danger">*</span>
+        </label>
+
+        <input
+          [type]="field.type"
+          class="form-control"
+          [id]="field.name"
+          [name]="field.name"
+          [required]="field.required"
+          [attr.autocomplete]="field.autocomplete || 'off'"
+          [(ngModel)]="utilisateur[field.name]"
+          #ctrl="ngModel"
+        />
+
+        <!-- Erreurs -->
+        <div class="text-danger small mt-1" *ngIf="formAjoutUtilisateur.submitted && ctrl.invalid">
+          <ng-container *ngIf="field.required && ctrl.errors?.['required']">
+            {{ field.label }} est obligatoire.
+          </ng-container>
+          <ng-container *ngIf="field.name === 'email' && ctrl.errors?.['email']">
+            Adresse email invalide.
+          </ng-container>
+        </div>
+      </div>
+
+      <!-- Sélecteur Rôle -->
+      <div class="col-md-4">
+        <label class="form-label" for="role">Rôle <span class="text-danger">*</span></label>
+        <select
+          id="role"
+          class="form-select"
+          name="role_id"
+          required
+          [(ngModel)]="utilisateur.role_id"
+          #roleCtrl="ngModel"
+        >
+          <option [ngValue]="null" disabled selected hidden>Sélectionner un rôle</option>
+          <option *ngFor="let r of roles" [ngValue]="r.id">{{ r.nom || r.name || r.title }}</option>
+        </select>
+        <div class="text-danger small mt-1" *ngIf="formAjoutUtilisateur.submitted && roleCtrl.invalid">
+          Le rôle est obligatoire.
+        </div>
+      </div>
+
+      <!-- Sélecteur Département -->
+      <div class="col-md-4">
+        <label class="form-label" for="departement">Département <span class="text-danger">*</span></label>
+        <select
+          id="departement"
+          class="form-select"
+          name="departement_id"
+          required
+          [(ngModel)]="utilisateur.departement_id"
+          #depCtrl="ngModel"
+        >
+          <option [ngValue]="null" disabled selected hidden>Sélectionner un département</option>
+          <option *ngFor="let d of departements" [ngValue]="d.id">{{ d.nom || d.name || d.title }}</option>
+        </select>
+        <div class="text-danger small mt-1" *ngIf="formAjoutUtilisateur.submitted && depCtrl.invalid">
+          Le département est obligatoire.
+        </div>
+      </div>
+
+      <!-- Sélecteur Grade -->
+      <div class="col-md-4">
+        <label class="form-label" for="grade">Grade <span class="text-danger">*</span></label>
+        <select
+          id="grade"
+          class="form-select"
+          name="grade_id"
+          required
+          [(ngModel)]="utilisateur.grade_id"
+          #gradeCtrl="ngModel"
+        >
+          <option [ngValue]="null" disabled selected hidden>Sélectionner un grade</option>
+          <option *ngFor="let g of grades" [ngValue]="g.id">{{ g.titre || g.nom || ('Pouvoir ' + (g.pouvoir ?? '')) }}</option>
+        </select>
+        <div class="text-danger small mt-1" *ngIf="formAjoutUtilisateur.submitted && gradeCtrl.invalid">
+          Le grade est obligatoire.
+        </div>
+      </div>
+
+      <!-- Upload Photo -->
+      <div class="col-md-6">
+        <label class="form-label" for="photo">Photo</label>
+        <input
+          type="file"
+          accept="image/*"
+          class="form-control"
+          (change)="onFileSelected($event)"
+          id="photo"
+        />
+      </div>
+    </div>
+
+    <div class="mt-3">
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="formAjoutUtilisateur.invalid || isSubmitting"
+        [attr.aria-busy]="isSubmitting"
+      >
+        {{ isSubmitting ? 'Ajout…' : 'Ajouter' }}
+      </button>
+    </div>
+  </form>
+
+  <!-- Message mot de passe généré -->
+  <div *ngIf="motDePasseGenere" class="alert alert-success mt-3" role="alert">
+    <strong>Mot de passe généré :</strong> {{ motDePasseGenere }}
+  </div>
+</div>

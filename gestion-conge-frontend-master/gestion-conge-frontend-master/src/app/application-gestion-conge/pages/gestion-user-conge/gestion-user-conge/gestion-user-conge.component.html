@@ -1,0 +1,35 @@
+<div class="container mt-4">
+  <h3>Mes soldes de congé (tous types)</h3>
+
+  <div *ngIf="isLoading" class="alert alert-info">Chargement en cours...</div>
+  <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+
+  <table *ngIf="!isLoading && !errorMessage" class="table table-bordered table-hover">
+    <thead class="table-light">
+      <tr>
+        <th>Type de congé</th>
+        <th>Solde (jours)</th>
+        <th>Année</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let s of soldes; trackBy: trackByType">
+        <td>{{ getTypeNom(s.type_conge_id) }}</td>
+        <td>{{ s.solde }}</td>
+        <td>{{ s.annee || '—' }}</td>
+      </tr>
+
+      <tr *ngIf="soldes && soldes.length === 0">
+        <td colspan="3" class="text-center">Aucun type de congé trouvé.</td>
+      </tr>
+
+      <!-- Ligne Total -->
+      <tr *ngIf="soldes && soldes.length > 0" class="table-secondary fw-bold">
+        <td>Total</td>
+        <td>{{ totalSolde }}</td>
+        <td>—</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

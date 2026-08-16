@@ -1,0 +1,165 @@
+<div class="container mt-4">
+  <h3>Gestion des types de congé</h3>
+
+  <!-- Messages -->
+  <div *ngIf="message" class="alert alert-success">{{ message }}</div>
+  <div *ngIf="messageError" class="alert alert-danger">{{ messageError }}</div>
+
+  <!-- Formulaire création -->
+  <div class="mb-3 d-flex flex-wrap gap-2 align-items-center">
+    <input
+      type="text"
+      [(ngModel)]="newType.nom"
+      name="nom"
+      class="form-control"
+      placeholder="Nom"
+      required
+    />
+    <input
+      type="number"
+      [(ngModel)]="newType.duree"
+      name="duree"
+      class="form-control"
+      placeholder="Durée"
+      min="1"
+      required
+    />
+
+    <select
+      [(ngModel)]="newType.unite"
+      name="unite"
+      class="form-select"
+      required
+    >
+      <option value="" disabled selected>Sélectionnez l'unité</option>
+      <option *ngFor="let u of unites" [value]="u">{{ u }}</option>
+    </select>
+
+    <select
+      [(ngModel)]="newType.periode"
+      name="periode"
+      class="form-select"
+      required
+    >
+      <option value="" disabled selected>Sélectionnez la périodicité</option>
+      <option *ngFor="let p of periodicites" [value]="p">{{ p }}</option>
+    </select>
+
+    <button
+      class="btn btn-primary"
+      (click)="createTypeConge()"
+      [disabled]="!isFormValid(newType)"
+      type="button"
+    >
+      Ajouter
+    </button>
+  </div>
+
+  <!-- Tableau -->
+  <table class="table table-bordered table-striped">
+    <thead class="table-light">
+      <tr>
+        <th>ID</th>
+        <th>Nom</th>
+        <th>Périodicité</th>
+        <th>Unité</th>
+        <th>Durée</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let type of typesConge">
+        <td>{{ type.id }}</td>
+
+        <td *ngIf="editId !== type.id">{{ type.nom }}</td>
+        <td *ngIf="editId === type.id">
+          <input
+            [(ngModel)]="editType.nom"
+            name="editNom"
+            class="form-control"
+            required
+          />
+        </td>
+
+        <td *ngIf="editId !== type.id">{{ type.periode }}</td>
+        <td *ngIf="editId === type.id">
+          <select
+            [(ngModel)]="editType.periode"
+            name="editPeriode"
+            class="form-select"
+            required
+          >
+            <option *ngFor="let p of periodicites" [value]="p">{{ p }}</option>
+          </select>
+        </td>
+
+        <td *ngIf="editId !== type.id">{{ type.unite }}</td>
+        <td *ngIf="editId === type.id">
+          <select
+            [(ngModel)]="editType.unite"
+            name="editUnite"
+            class="form-select"
+            required
+          >
+            <option *ngFor="let u of unites" [value]="u">{{ u }}</option>
+          </select>
+        </td>
+
+        <td *ngIf="editId !== type.id">{{ type.duree }}</td>
+        <td *ngIf="editId === type.id">
+          <input
+            type="number"
+            [(ngModel)]="editType.duree"
+            name="editDuree"
+            class="form-control"
+            min="1"
+            required
+          />
+        </td>
+
+        <td>
+          <div *ngIf="editId !== type.id">
+            <button
+              class="btn btn-sm btn-primary me-1"
+              (click)="startEdit(type)"
+              type="button"
+            >
+              Modifier
+            </button>
+            <button
+              class="btn btn-sm btn-danger"
+              (click)="deleteTypeConge(type.id!)"
+              type="button"
+            >
+              Supprimer
+            </button>
+          </div>
+          <div *ngIf="editId === type.id">
+            <button
+              class="btn btn-sm btn-success me-1"
+              (click)="updateTypeConge()"
+              [disabled]="!isFormValid(editType)"
+              type="button"
+            >
+              Valider
+            </button>
+            <button
+              class="btn btn-sm btn-secondary"
+              (click)="cancelEdit()"
+              type="button"
+            >
+              Annuler
+            </button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div
+    *ngIf="typesConge.length === 0"
+    class="text-muted text-center"
+  >
+    Aucun type de congé trouvé.
+  </div>
+</div>

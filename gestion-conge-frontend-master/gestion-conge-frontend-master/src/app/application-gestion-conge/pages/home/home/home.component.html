@@ -1,0 +1,136 @@
+<!-- Simple dashboard, no charts -->
+<div class="container-fluid" *ngIf="!loading && !errorMsg; else stateTpl">
+  <div class="row g-3">
+
+    <!-- KPI cards -->
+    <div class="col-12 col-md-6 col-xl-3">
+      <div class="card h-100">
+        <div class="card-body d-flex align-items-center">
+          <div class="me-3"><app-feather-icons [icon]="'layers'"></app-feather-icons></div>
+          <div class="flex-grow-1">
+            <div class="h4 mb-0">{{ kpiTotal }}</div>
+            <div class="text-muted">Total demandes</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-6 col-xl-3">
+      <div class="card h-100">
+        <div class="card-body d-flex align-items-center">
+          <div class="me-3"><app-feather-icons [icon]="'check-circle'"></app-feather-icons></div>
+          <div class="flex-grow-1">
+            <div class="h4 mb-0">{{ kpiAcceptees }}</div>
+            <div class="text-muted">Acceptées</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-6 col-xl-3">
+      <div class="card h-100">
+        <div class="card-body d-flex align-items-center">
+          <div class="me-3"><app-feather-icons [icon]="'clock'"></app-feather-icons></div>
+          <div class="flex-grow-1">
+            <div class="h4 mb-0">{{ kpiEnAttente }}</div>
+            <div class="text-muted">En attente</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-md-6 col-xl-3">
+      <div class="card h-100">
+        <div class="card-body d-flex align-items-center">
+          <div class="me-3"><app-feather-icons [icon]="'x-circle'"></app-feather-icons></div>
+          <div class="flex-grow-1">
+            <div class="h4 mb-0">{{ kpiRejetees }}</div>
+            <div class="text-muted">Rejetées</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dernières demandes -->
+    <div class="col-12 col-xl-8">
+      <div class="card h-100">
+        <div class="card-header">
+          <h5 class="mb-0">Dernières demandes</h5>
+        </div>
+        <div class="card-body p-0">
+          <div *ngIf="demandesRecentes.length; else noDemande" class="table-responsive">
+            <table class="table align-middle mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>Type</th>
+                  <th>Date début</th>
+                  <th>Date fin</th>
+                  <th>Jours</th>
+                  <th>Statut</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let d of demandesRecentes">
+                  <td>{{ d.type_conge_nom || ('Type #' + d.type_conge_id) }}</td>
+                  <td>{{ d.date_debut | date:'mediumDate' }}</td>
+                  <td>{{ d.date_fin   | date:'mediumDate' }}</td>
+                  <td>
+                    <ng-container *ngIf="getNbJours(d) as nj; else tiretNb">
+                      {{ nj | number:'1.0-0' }}
+                    </ng-container>
+                    <ng-template #tiretNb>—</ng-template>
+                  </td>
+                  <td>
+                    <span [class]="statutBadgeClass(d)">{{ statutText(d) }}</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <ng-template #noDemande>
+            <div class="p-3 text-muted">Aucune demande pour l’instant.</div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+
+    <!-- Activité
+    <div class="col-12 col-xl-4">
+      <div class="card h-100">
+        <div class="card-header">
+          <h5 class="mb-0">Activité</h5>
+        </div>
+        <div class="card-body">
+          <div *ngIf="activites.length; else noAct">
+            <div class="d-flex align-items-start mb-3" *ngFor="let a of activites">
+              <div class="me-3">
+                <span class="badge rounded-pill bg-primary-subtle text-primary">
+                  <app-feather-icons [icon]="a.icon || 'activity'"></app-feather-icons>
+                </span>
+              </div>
+              <div class="flex-grow-1">
+                <div class="fw-semibold">{{ a.titre }}</div>
+                <div class="text-muted small">{{ a.texte || '—' }}</div>
+              </div>
+              <div class="text-muted small">{{ a.when }}</div>
+            </div>
+          </div>
+          <ng-template #noAct>
+            <div class="text-muted">Aucune activité récente.</div>
+          </ng-template>
+        </div>
+      </div>
+    </div> -->
+
+  </div>
+</div>
+
+<!-- Loading / Error -->
+<ng-template #stateTpl>
+  <div class="container py-5">
+    <div *ngIf="loading" class="text-center text-muted">Chargement…</div>
+    <div *ngIf="!loading && errorMsg" class="alert alert-danger" role="alert">
+      {{ errorMsg }}
+    </div>
+  </div>
+</ng-template>

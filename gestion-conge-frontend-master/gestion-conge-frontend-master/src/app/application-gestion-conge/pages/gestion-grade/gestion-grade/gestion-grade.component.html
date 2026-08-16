@@ -1,0 +1,74 @@
+<div class="container mt-4">
+  <h3>Gestion des grades</h3>
+
+  <!-- Ajout de grade -->
+  <div class="mb-3 d-flex">
+    <input type="text" class="form-control me-2" placeholder="Nouveau grade..." [(ngModel)]="addTitre" name="addTitre" />
+    <input type="number" class="form-control me-2" placeholder="Pouvoir..." [(ngModel)]="addPouvoir" name="addPouvoir" />
+    <button class="btn btn-primary" (click)="onAdd()">Ajouter</button>
+  </div>
+
+  <!-- Tableau des grades -->
+  <table class="table table-bordered" *ngIf="grades.length > 0">
+    <thead class="table-light">
+      <tr>
+        <th>ID</th>
+        <th>Titre</th>
+        <th>Pouvoir</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let g of grades">
+        <td>{{ g.id }}</td>
+
+        <!-- Affichage / édition du titre -->
+        <td *ngIf="editId !== g.id">{{ g.titre }}</td>
+        <td *ngIf="editId === g.id">
+          <input [(ngModel)]="editTitre" class="form-control" />
+        </td>
+
+        <!-- Affichage / édition du pouvoir -->
+        <td *ngIf="editId !== g.id">{{ g.pouvoir }}</td>
+        <td *ngIf="editId === g.id">
+          <input type="number" [(ngModel)]="editPouvoir" class="form-control" />
+        </td>
+
+        <!-- Actions -->
+        <td>
+          <div *ngIf="editId === g.id">
+            <button class="btn btn-success btn-sm me-1" (click)="onUpdate(g.id)">Valider</button>
+            <button class="btn btn-secondary btn-sm" (click)="onCancelEdit()">Annuler</button>
+          </div>
+          <div *ngIf="editId !== g.id">
+            <button class="btn btn-primary btn-sm me-1" (click)="onEdit(g)">Modifier</button>
+            <button class="btn btn-danger btn-sm me-1" (click)="onDelete(g.id)">Supprimer</button>
+            <button class="btn btn-info btn-sm me-1" (click)="onViewUsers(g.id)">Utilisateurs</button>
+
+            <!--<input type="text" [(ngModel)]="filterPoste" placeholder="Filtrer par poste..." class="form-control d-inline-block w-auto me-1" />
+            <button class="btn btn-outline-secondary btn-sm" (click)="onFilterUsers(g.id, filterPoste)">Filtrer</button>-->
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="grades.length === 0" class="text-center text-muted">
+    Aucun grade trouvé.
+  </div>
+
+  <div *ngIf="selectedUsers.length > 0" class="mt-4">
+    <h5>Utilisateurs du grade "{{ selectedGradeTitre }}"</h5>
+    <ul class="list-group">
+      <li *ngFor="let user of selectedUsers" class="list-group-item">
+        <strong>{{ user.nom }} {{ user.prenom }}</strong><br />
+        Email : {{ user.email }}<br />
+        Poste : {{ user.poste || 'Non défini' }}
+      </li>
+    </ul>
+  </div>
+
+  <div *ngIf="selectedUsers.length === 0 && selectedGradeTitre" class="text-muted mt-4">
+    Aucun utilisateur trouvé pour le grade "{{ selectedGradeTitre }}".
+  </div>
+</div>

@@ -1,0 +1,162 @@
+<div class="container mt-4">
+  <h2 class="mb-3">Mon historique des demandes</h2>
+
+  <!-- ───────────── DERNIÈRE DEMANDE / TIMELINE ───────────── -->
+  <div *ngIf="loadingDemande" class="alert alert-info" role="status" aria-live="polite">
+    Chargement de la dernière demande...
+  </div>
+
+  <ng-container *ngIf="!loadingDemande">
+    <div *ngIf="timelineSteps.length > 0" class="card mb-4">
+      <div class="card-header d-flex align-items-center justify-content-between">
+        <h5 class="mb-0">
+          Dernière demande :
+          <ng-container *ngIf="derniereDemande; else noDemand">
+            <span
+              class="ms-2 badge"
+              [ngClass]="'bg-' + getBadgeClass(derniereDemande.statut_final ?? derniereDemande.statut_phase1 ?? derniereDemande.statut)"
+            >
+              {{ (derniereDemande.statut_final || derniereDemande.statut_phase1 || derniereDemande.statut || 'en attente') | titlecase }}
+            </span>
+          </ng-container>
+          <ng-template #noDemand> Aucune demande </ng-template>
+        </h5>
+      </div>
+
+      <div class="card-body">
+        <!-- Infos synthétiques de la dernière demande -->
+        <div *ngIf="derniereDemande" class="row g-3 mb-3 small text-muted">
+          <div class="col-12 col-md-auto">
+            <strong>Type :</strong>
+            {{ derniereDemande.type_conge_nom || 'N/A' }}
+          </div>
+          <div class="col-12 col-md-auto">
+            <strong>Période :</strong>
+            {{ formatDate(derniereDemande.date_debut) }} → {{ formatDate(derniereDemande.date_fin) }}
+          </div>
+          <div class="col-12 col-md-auto">
+            <strong>Jours :</strong>
+            {{ derniereDemande.nb_jours ?? 'N/A' }}
+          </div>
+          <div class="col-12 col-md-auto" *ngIf="derniereDemande.date_demande">
+            <strong>Soumise :</strong>
+            {{ formatDate(derniereDemande.date_demande) }}
+          </div>
+          <div class="col-12 col-md-auto" *ngIf="derniereDemande.date_modification">
+            <strong>MAJ :</strong>
+            {{ formatDate(derniereDemande.date_modification) }}
+          </div>
+        </div>
+
+        <!-- Timeline -->
+        <div class="wizard" aria-label="Progression de la demande">
+          <div class="wizard-track" aria-hidden="true"></div>
+          <div class="wizard-steps">
+            <div
+              class="wizard-step"
+              *ngFor="let step of timelineSteps; trackBy: trackById"
+              [ngClass]="{
+                'is-active': step.state === 'active',
+                'is-done': step.state === 'done',
+                'is-rejected': step.state === 'rejected'
+              }"
+              [attr.title]="step.hint || step.label"
+              [attr.aria-current]="step.state === 'active' ? 'step' : null"
+            >
+              <div class="step-circle">{{ step.circleText }}</div>
+              <div class="step-label">{{ step.label }}</div>
+              <div class="step-connector" aria-hidden="true"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Récap statuts -->
+        <div *ngIf="derniereDemande" class="mt-3 small text-muted">
+          Phase 1 (Manager):
+          <span class="badge" [ngClass]="'bg-' + getBadgeClass(derniereDemande.statut_phase1)">
+            {{ (derniereDemande.statut_phase1 || 'en attente') | titlecase }}
+          </span>
+
+          <ng-container *ngIf="derniereDemande.statut && getBadgeClass(derniereDemande.statut) === 'info'">
+            &nbsp;|&nbsp;
+            <span class="badge bg-info">En attente Super Admin</span>
+          </ng-container>
+
+          &nbsp;|&nbsp; Décision finale:
+          <span class="badge" [ngClass]="'bg-' + getBadgeClass(derniereDemande.statut_final)">
+            {{ (derniereDemande.statut_final || 'en attente') | titlecase }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="!derniereDemande" class="alert alert-info" role="status" aria-live="polite">
+      Aucune demande ce mois.
+    </div>
+  </ng-container>
+
+  <!-- ───────────── HISTORIQUE TABLE ───────────── -->
+  <div *ngIf="loading" class="alert alert-info" role="status" aria-live="polite">
+    Chargement en cours...
+  </div>
+
+  <div class="table-responsive" *ngIf="!loading && historiques.length > 0">
+    <table class="table table-bordered table-striped align-middle">
+      <thead class="table-light">
+        <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Date Demande</th>
+          <th scope="col">Type</th>
+          <th scope="col">Date Début</th>
+          <th scope="col">Date Fin</th>
+          <th scope="col">Nb Jours</th>
+          <th scope="col">Statut</th>
+          <th scope="col">Date Réponse</th>
+           <!--<th scope="col">Modifié par</th>-->
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let h of historiques; trackBy: trackById">
+          <td>{{ h.id }}</td>
+          <td>{{ formatDate(h.date_demande) }}</td>
+          <td>{{ h.type_conge || 'N/A' }}</td>
+          <td>{{ formatDate(h.date_debut) }}</td>
+          <td>{{ formatDate(h.date_fin) }}</td>
+          <td>{{ h.nombre_jours ?? 'N/A' }}</td>
+          <td>
+            <span class="badge" [ngClass]="'bg-' + (h.statutClass || 'secondary')">
+              {{ h.statut || 'N/A' }}
+            </span>
+          </td>
+          <td>{{ formatDate(h.date_reponse) }}</td>
+           <!--<td>{{ h.modifie_par || 'N/A' }}</td>-->
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div *ngIf="!loading && historiques.length === 0" class="alert alert-info" role="status" aria-live="polite">
+    Aucun historique à afficher.
+  </div>
+
+  <!-- ───────────── PAGINATION ───────────── -->
+  <nav *ngIf="totalPages > 1" class="mt-3" aria-label="Pagination de l'historique">
+    <ul class="pagination justify-content-center mb-0">
+      <li class="page-item" [class.disabled]="page === 1">
+        <a class="page-link" role="button" (click)="goToPage(page - 1)">Précédent</a>
+      </li>
+
+      <li
+        class="page-item"
+        *ngFor="let _ of [].constructor(totalPages); let i = index"
+        [class.active]="page === i + 1"
+      >
+        <a class="page-link" role="button" (click)="goToPage(i + 1)">{{ i + 1 }}</a>
+      </li>
+
+      <li class="page-item" [class.disabled]="page === totalPages">
+        <a class="page-link" role="button" (click)="goToPage(page + 1)">Suivant</a>
+      </li>
+    </ul>
+  </nav>
+</div>

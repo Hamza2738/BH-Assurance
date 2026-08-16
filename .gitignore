@@ -1,0 +1,34 @@
+# ============================
+# Backend - Python / Flask
+# ============================
+venv/
+__pycache__/
+*.pyc
+*.pyo
+instance/
+*.db
+*.sqlite
+*.sqlite3
+
+# Fichiers de config sensibles
+config.py
+*.env
+
+# ============================
+# Frontend - Node / Angular
+# ============================
+node_modules/
+dist/
+.angular/
+*.log
+
+# ============================
+# IDE / OS
+# ============================
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+*.zip
+flask_session/

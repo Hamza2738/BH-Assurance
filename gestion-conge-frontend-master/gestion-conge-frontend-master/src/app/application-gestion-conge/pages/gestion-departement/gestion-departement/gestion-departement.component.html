@@ -1,0 +1,65 @@
+<div class="container mt-4">
+  <h3>Gestion des départements</h3>
+
+  <!-- Ajout de département -->
+  <div class="mb-3 d-flex">
+    <input #inputAdd type="text" class="form-control me-2" placeholder="Nouveau département..." />
+    <button class="btn btn-primary" (click)="onAdd(inputAdd.value); inputAdd.value=''">Ajouter</button>
+  </div>
+
+  <!-- Tableau des départements -->
+  <table class="table table-bordered">
+    <thead class="table-light">
+      <tr>
+        <th>ID</th>
+        <th>Nom</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let d of departements">
+        <td>{{ d.id }}</td>
+
+        <!-- Nom (affichage ou modification) -->
+        <td *ngIf="editId !== d.id">{{ d.nom }}</td>
+        <td *ngIf="editId === d.id">
+          <input [(ngModel)]="editNom" class="form-control" />
+        </td>
+
+        <!-- Actions -->
+        <td>
+          <div *ngIf="editId === d.id">
+            <button class="btn btn-success btn-sm me-1" (click)="onUpdate(d.id)">Valider</button>
+            <button class="btn btn-secondary btn-sm" (click)="onCancelEdit()">Annuler</button>
+          </div>
+          <div *ngIf="editId !== d.id">
+            <button class="btn btn-primary btn-sm me-1" (click)="onEdit(d)">Modifier</button>
+            <button class="btn btn-danger btn-sm me-1" (click)="onDelete(d.id)">Supprimer</button>
+            <button class="btn btn-info btn-sm" (click)="onViewEmployes(d.id)">Employés</button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Message si aucun département -->
+  <div *ngIf="departements.length === 0" class="text-center text-muted">
+    Aucun département trouvé.
+  </div>
+
+  <!-- Liste des employés -->
+<div *ngIf="selectedEmployes.length > 0" class="mt-4">
+  <h5>Employés du département "{{ selectedDepartementNom }}"</h5>
+  <ul class="list-group">
+    <li *ngFor="let emp of selectedEmployes" class="list-group-item">
+      <strong>{{ emp.nom }} {{ emp.prenom }}</strong><br />
+      Email : {{ emp.email }}<br />
+      Poste : {{ emp.poste || 'Non défini' }}
+    </li>
+  </ul>
+</div>
+
+<!-- Message si aucun employé -->
+<div *ngIf="selectedEmployes.length === 0 && selectedDepartementNom" class="text-muted mt-4">
+  Aucun employé trouvé pour le département "{{ selectedDepartementNom }}".
+</div>

@@ -1,0 +1,62 @@
+<div class="page-wrapper">
+  <div class="auth-bg">
+    <div class="authentication-box">
+      <div class="text-center">
+        <img src="assets/images/bh1.png" alt="Logo">
+      </div>
+      <div class="card mt-4">
+        <div class="card-body">
+          <div class="text-center">
+            <h4>Connexion</h4>
+            <h6>Veuillez entrer votre e-mail et mot de passe</h6>
+          </div>
+          <form class="theme-form" [formGroup]="loginForm" (ngSubmit)="login()">
+            <!-- Champ Email -->
+            <div class="form-group">
+              <label class="col-form-label pt-0">Adresse e-mail</label>
+              <input class="form-control" formControlName="email" type="email" required>
+              <div *ngIf="loginForm.controls.email.touched && loginForm.controls.email.errors" class="text-danger mt-1">
+                <div *ngIf="loginForm.controls.email.errors.required">L'e-mail est requis</div>
+                <div *ngIf="loginForm.controls.email.errors.email">Adresse e-mail invalide</div>
+              </div>
+            </div>
+
+            <!-- Champ Mot de passe -->
+            <div class="form-group">
+              <label class="col-form-label">Mot de passe</label>
+              <input class="form-control" formControlName="password" type="password" required>
+              <div *ngIf="loginForm.controls.password.touched && loginForm.controls.password.errors" class="text-danger mt-1">
+                Le mot de passe est requis
+              </div>
+            </div>
+
+            <!-- Case à cocher -->
+            <div class="checkbox p-0">
+              <input id="checkbox1" type="checkbox">
+              <label for="checkbox1">Se souvenir de moi</label>
+            </div>
+
+            <!-- Bouton de soumission -->
+            <div class="form-group row mt-3 mb-0">
+              <button
+                class="btn btn-primary btn-block btn-lg"
+                [disabled]="loginForm.invalid || isLoading"
+                type="submit">
+                <span *ngIf="!isLoading">Se connecter</span>
+                <span *ngIf="isLoading" class="loader"></span>
+              </button>
+            </div>
+
+            <!-- Message d'erreur -->
+            <div *ngIf="errorMessage" class="alert alert-danger mt-3">
+              {{ errorMessage }}
+            </div>
+
+
+            
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,143 @@
+<div class="container mt-4">
+  <h3>Ajouter une demande de congé</h3>
+
+  <form (ngSubmit)="onSubmit()" #formDemande="ngForm" novalidate>
+    <!-- Type de congé -->
+    <div class="mb-3">
+      <label for="type_conge" class="form-label">
+        Type de congé <span class="text-danger">*</span>
+      </label>
+
+      <select
+        id="type_conge"
+        class="form-control"
+        name="type_conge_id"
+        required
+        [(ngModel)]="demande.type_conge_id"
+        (change)="onTypeCongeChange()"
+        [disabled]="submitting"
+        aria-required="true"
+      >
+        <!-- Placeholder: DOIT être null pour que required fonctionne -->
+        <option [ngValue]="null" disabled selected hidden>
+          Sélectionnez un type de congé
+        </option>
+        <option *ngFor="let t of typesConge" [ngValue]="t.id">
+          {{ t.nom }}
+        </option>
+      </select>
+
+      <div
+        *ngIf="formDemande.submitted && formDemande.controls['type_conge_id']?.invalid"
+        class="text-danger"
+      >
+        Le type de congé est obligatoire.
+      </div>
+    </div>
+
+    <!-- Solde disponible -->
+    <div *ngIf="soldeDisponible !== null" class="alert alert-info" role="status">
+      Solde disponible : <strong>{{ soldeDisponible }}</strong> jours
+      <div *ngIf="soldeDisponible === 0" class="small text-danger mt-1">
+        ⚠️ Vous n’avez plus de solde disponible pour ce type de congé.
+      </div>
+    </div>
+
+    <!-- Date début -->
+    <div class="mb-3">
+      <label for="date_debut" class="form-label">
+        Date de début <span class="text-danger">*</span>
+      </label>
+      <input
+        type="date"
+        id="date_debut"
+        name="date_debut"
+        class="form-control"
+        required
+        [(ngModel)]="demande.date_debut"
+        [disabled]="submitting"
+        autocomplete="off"
+        aria-required="true"
+      />
+      <div
+        *ngIf="formDemande.submitted && formDemande.controls['date_debut']?.invalid"
+        class="text-danger"
+      >
+        La date de début est obligatoire.
+      </div>
+    </div>
+
+    <!-- Date fin -->
+    <div class="mb-3">
+      <label for="date_fin" class="form-label">
+        Date de fin <span class="text-danger">*</span>
+      </label>
+      <input
+        type="date"
+        id="date_fin"
+        name="date_fin"
+        class="form-control"
+        required
+        [(ngModel)]="demande.date_fin"
+        [min]="demande.date_debut || null"
+        [disabled]="submitting"
+        autocomplete="off"
+        aria-required="true"
+      />
+      <div
+        *ngIf="formDemande.submitted && formDemande.controls['date_fin']?.invalid"
+        class="text-danger"
+      >
+        La date de fin est obligatoire.
+      </div>
+      <div *ngIf="dateFinAvantDateDebut" class="text-danger">
+        La date de fin doit être postérieure ou égale à la date de début.
+      </div>
+    </div>
+
+    <!-- Motif -->
+    <div class="mb-3">
+      <label for="motif" class="form-label">Motif</label>
+      <textarea
+        id="motif"
+        name="motif"
+        class="form-control"
+        rows="3"
+        [(ngModel)]="demande.motif"
+        placeholder="(facultatif)"
+        [disabled]="submitting"
+      ></textarea>
+    </div>
+
+    <!-- Nombre de jours (readonly) -->
+    <div class="mb-3">
+      <label for="nb_jours" class="form-label">Nombre de jours</label>
+      <input
+        type="number"
+        id="nb_jours"
+        class="form-control"
+        [value]="nbJoursCalcules"
+        readonly
+        aria-readonly="true"
+      />
+    </div>
+
+    <!-- Bouton -->
+    <button
+      type="submit"
+      class="btn btn-primary"
+      [disabled]="formDemande.invalid || dateFinAvantDateDebut || submitting"
+      [attr.aria-busy]="submitting"
+    >
+      {{ submitting ? 'Envoi en cours...' : 'Envoyer la demande' }}
+    </button>
+  </form>
+
+  <!-- Messages -->
+  <div *ngIf="messageSuccess" class="alert alert-success mt-3" role="alert">
+    ✅ {{ messageSuccess }}
+  </div>
+  <div *ngIf="messageError" class="alert alert-danger mt-3" role="alert">
+    ⚠️ {{ messageError }}
+  </div>
+</div>

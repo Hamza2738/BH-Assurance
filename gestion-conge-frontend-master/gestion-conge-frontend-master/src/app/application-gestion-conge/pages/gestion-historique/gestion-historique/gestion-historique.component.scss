@@ -1,0 +1,113 @@
+.wizard { position: relative; padding-top: 10px; padding-bottom: 8px; }
+.wizard-track {
+  position: absolute; left: 0; right: 0; top: 34px; height: 2px;
+  background: #e5e7eb;
+}
+.wizard-steps { display: grid; grid-template-columns: repeat(4,1fr); position: relative; }
+.wizard-step { text-align: center; position: relative; }
+.wizard-step .step-label { margin-bottom: 8px; font-weight: 500; min-height: 20px; }
+.wizard-step .step-circle {
+  width: 46px; height: 46px; line-height: 46px;
+  margin: 0 auto;
+  border-radius: 50%;
+  background: #9ca3af;
+  color: white;
+  font-weight: 700;
+  z-index: 1;
+}
+.wizard-step .step-connector {
+  content: "";
+  position: absolute;
+  top: 34px;
+  left: 50%;
+  right: -50%;
+  height: 2px;
+  background: #e5e7eb;
+  z-index: 0;
+}
+.wizard-step:last-child .step-connector { display: none; }
+
+.wizard-step.is-done .step-circle, .wizard-step.is-done .step-connector { background: #3b82f6; }
+.wizard-step.is-active .step-circle { background: #3b82f6; box-shadow: 0 0 0 6px rgba(59,130,246,0.15); }
+.wizard-step.is-active .step-connector { background: #3b82f6; }
+.wizard-step.is-rejected .step-circle, .wizard-step.is-rejected .step-connector { background: #ef4444; }
+
+
+
+/* gestion-historique.component.scss */
+
+.wizard {
+  position: relative;
+  padding: 16px 8px;
+}
+
+.wizard-track {
+  position: absolute;
+  top: 32px;
+  left: 12px;
+  right: 12px;
+  height: 4px;
+  background: #e9ecef;
+  border-radius: 999px;
+}
+
+.wizard-steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  position: relative;
+}
+
+.wizard-step {
+  position: relative;
+  text-align: center;
+
+  .step-circle {
+    width: 28px;
+    height: 28px;
+    line-height: 28px;
+    margin: 0 auto 6px;
+    border-radius: 50%;
+    background: #dee2e6;
+    color: #495057;
+    font-weight: 600;
+  }
+
+  .step-label {
+    font-size: 0.85rem;
+    color: #6c757d;
+  }
+
+  .step-connector {
+    position: absolute;
+    top: 32px;
+    left: -50%;
+    width: 100%;
+    height: 4px;
+    background: transparent;
+  }
+
+  &.is-done .step-circle {
+    background: #198754; /* bootstrap success */
+    color: #fff;
+  }
+
+  &.is-active .step-circle {
+    background: #0d6efd; /* bootstrap primary */
+    color: #fff;
+    box-shadow: 0 0 0 4px rgba(13,110,253,0.15);
+  }
+
+  &.is-rejected .step-circle {
+    background: #dc3545; /* bootstrap danger */
+    color: #fff;
+  }
+
+  &.is-done ~ .wizard-step .step-connector {
+    background: #198754;
+  }
+
+  &.is-rejected ~ .wizard-step .step-connector {
+    background: #dc3545;
+  }
+}

@@ -1,0 +1,167 @@
+<!-- 🌐 Page Header Start -->
+<div class="page-main-header" [ngClass]="{ open: navServices.collapseSidebar }">
+  <div class="main-header-right row">
+    <!-- Logo Mobile -->
+    <div class="main-header-left col-auto p-0 d-lg-none">
+      <div class="logo-wrapper">
+        <a routerLink="/"><img src="assets/images/bh1.png" alt="Logo" /></a>
+      </div>
+    </div>
+
+    <!-- Sidebar Toggle Mobile -->
+    <div class="mobile-sidebar col-auto p-0">
+      <div class="media-body text-start switch-sm">
+        <label class="switch">
+          <a href="javascript:void(0)" (click)="collapseSidebar()">
+            <app-feather-icons [icon]="'align-left'"></app-feather-icons>
+          </a>
+        </label>
+      </div>
+    </div>
+
+    <!-- Right Nav -->
+    <div class="nav-right col">
+      <ul class="nav-menus" [ngClass]="{ open: openNav }">
+        <!-- 🔍 Search -->
+        <li>
+          <form class="form-inline search-form">
+            <div class="form-group mb-0">
+              <input
+                class="form-control-plaintext"
+                [(ngModel)]="text"
+                [ngModelOptions]="{ standalone: true }"
+                (keyup)="searchTerm(text)"
+                placeholder="Search.."
+              />
+
+              <!-- Results -->
+              <div class="Typeahead-menu" [class.is-open]="searchResult" *ngIf="menuItems?.length">
+                <div class="ProfileCard u-cf" *ngFor="let menuItem of menuItems | slice: 0:8">
+                  <div class="ProfileCard-avatar">
+                    <app-feather-icons [icon]="menuItem.icon"></app-feather-icons>
+                  </div>
+                  <div class="ProfileCard-details">
+                    <div class="ProfileCard-realName">
+                      <a [routerLink]="menuItem?.path" (click)="removeFix()">{{ menuItem?.title }}</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Empty -->
+              <div class="Typeahead-menu" [class.is-open]="searchResultEmpty">
+                <div class="tt-dataset tt-dataset-0">
+                  <div class="EmptyMessage">Oops!! No results found.</div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </li>
+
+        <!-- ⛶ Fullscreen -->
+        <li>
+          <a href="javascript:void(0)" (click)="toggleFullScreen()">
+            <app-feather-icons [icon]="'maximize'"></app-feather-icons>
+          </a>
+        </li>
+
+        <!-- 🌐 Language -->
+        <!--<li class="onhover-dropdown">
+          <a href="javascript:void(0)"><h6>{{ translate.currentLang?.toUpperCase() || 'EN' }}</h6></a>
+          <ul class="language-dropdown onhover-show-div p-20">
+            <li><a href="javascript:void(0)" (click)="changeLanguage('en')">English</a></li>
+            <li><a href="javascript:void(0)" (click)="changeLanguage('es')">Spanish</a></li>
+            <li><a href="javascript:void(0)" (click)="changeLanguage('pt')">Portuguese</a></li>
+            <li><a href="javascript:void(0)" (click)="changeLanguage('fr')">French</a></li>
+          </ul>
+        </li>-->
+
+        <!-- 🔔 Notifications -->
+        <li class="onhover-dropdown notification-menu">
+          <a href="javascript:void(0)" (click)="toggleNotifications()" class="position-relative">
+            <app-feather-icons [icon]="'bell'"></app-feather-icons>
+            <span class="dot" *ngIf="unreadCount > 0"></span>
+            <span class="badge bg-danger ms-1" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
+          </a>
+
+          <!-- Dropdown -->
+          <ul class="notification-dropdown onhover-show-div shadow rounded" *ngIf="showNotifications">
+            <!-- Header -->
+            <li class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom">
+              <strong>Notifications</strong>
+              <a
+                href="javascript:void(0)"
+                (click)="markAllAsRead()"
+                class="small"
+                [class.text-muted]="unreadCount === 0"
+                [class.text-primary]="unreadCount > 0"
+                [attr.aria-disabled]="unreadCount === 0"
+                >Mark all as read</a
+              >
+            </li>
+
+            <!-- Items -->
+            <li
+              *ngFor="let notif of notifications"
+              [ngClass]="{ 'bg-light': !notif.read }"
+              (click)="markAsRead(notif)"
+            >
+              <div class="p-2">
+                <div class="d-flex justify-content-between">
+                  <div class="me-3">
+                    <div class="fw-semibold">{{ notif.title }}</div>
+                    <div class="small text-muted">{{ notif.text }}</div>
+                    <div class="small text-muted" *ngIf="notif.senderName">from {{ notif.senderName }}</div>
+                  </div>
+                  <small class="text-muted ms-3">{{ notif.sentAt | date: 'short' }}</small>
+                </div>
+              </div>
+            </li>
+
+            <!-- Empty -->
+            <li *ngIf="!notifications.length" class="text-center py-3 text-muted">No notifications</li>
+
+            <!-- Footer -->
+            <li class="text-center border-top py-2">
+              <a href="javascript:void(0)" class="small">View all</a>
+            </li>
+          </ul>
+        </li>
+
+        
+        <!-- 💬 Messages -->
+        <!-- <li>
+          <a href="javascript:void(0)" (click)="right_side_bar()">
+            <app-feather-icons [icon]="'message-circle'"></app-feather-icons>
+            <span class="dot"></span>
+          </a>
+        </li> -->
+
+        <!-- 👤 Profile -->
+        <li class="onhover-dropdown" *ngIf="authService.currentUserValue as user">
+          <div class="media align-items-center">
+            <img [src]="user.photoURL || 'assets/images/user.png'" class="align-self-center img-30 rounded-circle" />
+            <div class="dotted-animation">
+              <span class="animate-circle"></span>
+              <span class="main-circle"></span>
+            </div>
+          </div>
+          <ul class="profile-dropdown onhover-show-div p-20">
+            <!--
+            <li><a routerLink="/profile">Edit Profile</a></li>
+            <li><a routerLink="/inbox">Inbox</a></li>
+            <li><a href="javascript:void(0)">Lock Screen</a></li>
+            <li><a routerLink="/settings">Settings</a></li> -->
+            <li><a href="javascript:void(0)" (click)="authService.SignOut()">Logout</a></li>
+          </ul>
+        </li>
+      </ul>
+
+      <!-- Mobile Nav Toggle -->
+      <div class="d-lg-none mobile-toggle pull-right" (click)="openMobileNav()">
+        <app-feather-icons [icon]="'more-horizontal'"></app-feather-icons>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 🌐 Page Header End -->
