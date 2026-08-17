@@ -1,4 +1,4 @@
-# 🏢 BH@CONGÉ — Plateforme de Gestion des Congés (BH Assurance)
+# 🏢 BH@CONGÉ — Plateforme de Gestion des Congés Angular 14 & Flask
 
 ## 🧩 Fonctionnalités principales
 
